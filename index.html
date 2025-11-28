@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kalkulator próby hamulca</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f9f9f9; }
+    h2 { color: #333; }
+    .panel { background: #fff; padding: 15px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+    label { display: block; margin: 10px 0; }
+    input[type="number"], input[type="text"] { width: 100%; padding: 8px; margin-top: 4px; }
+    input[type="checkbox"] { margin-left: 10px; }
+    button { padding: 10px 20px; margin-top: 10px; background: #007acc; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background: #005fa3; }
+    .error { color: red; font-weight: bold; }
+    .success { color: green; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h2>Kalkulator próby hamulca 🚆</h2>
+
+<div class="panel">
+  <h3>Panel 1 – Dane pociągu</h3>
+  <label>Numer pociągu: <input id="nr" type="text" maxlength="6"></label>
+  <label><input id="intl" type="checkbox"> Pociąg międzynarodowy</label>
+  <label><input id="fast" type="checkbox"> Prędkość powyżej 120 km/h</label>
+  <label><input id="magnet" type="checkbox"> Czynne hamulce magnetyczne</label>
+</div>
+
+<div class="panel">
+  <h3>Panel 2 – Dane masowe</h3>
+  <label>Masa ogólna składu [t]: <input id="masaSkladu" type="number"></label>
+  <label>Masa ogólna pociągu [t]: <input id="masaPociagu" type="number"></label>
+  <label>Masa hamująca rzeczywista [t]: <input id="mhr" type="number"></label>
+  <label>Procent wymagany [%]: <input id="pw" type="number"></label>
+  <button onclick="oblicz()">Oblicz</button>
+</div>
+
+<div class="panel">
+  <h3>Panel 3 – Wyniki</h3>
+  <p id="wynik"></p>
+  <p id="komunikat"></p>
+  <button onclick="location.reload()">Nowa kalkulacja</button>
+</div>
+
+<script>
+function oblicz() {
+  let masaSkladu = parseFloat(document.getElementById("masaSkladu").value);
+  let masaPociagu = parseFloat(document.getElementById("masaPociagu").value);
+  let mhr = parseFloat(document.getElementById("mhr").value);
+  let pw = parseFloat(document.getElementById("pw").value);
+
+  let fast = document.getElementById("fast").checked;
+  let intl = document.getElementById("intl").checked;
+
+  // wybór Mo zgodnie z zasadą
+  let Mo = (!fast && !intl && masaSkladu >= 200) ? masaSkladu : masaPociagu;
+
+  // masa hamująca wymagana
+  let Mhw = Math.ceil((Mo * pw) / 100);
+
+  // procent rzeczywisty
+  let Pr = Math.floor((mhr * 100) / Mo);
+
+  document.getElementById("wynik").innerHTML =
+    `Masa hamująca wymagana: <strong>${Mhw} t</strong><br>
+     Procent rzeczywisty: <strong>${Pr}%</strong>`;
+
+  if (Pr < pw) {
+    document.getElementById("komunikat").innerHTML =
+      "<span class='error'>Dodaj wagony lub zmniejsz prędkość pociągu zgodnie z tabelami!</span>";
+  } else {
+    document.getElementById("komunikat").innerHTML =
+      "<span class='success'>Warunki spełnione ✅</span>";
+  }
+}
+</script>
+
+</body>
+</html>
